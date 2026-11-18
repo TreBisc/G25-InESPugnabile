@@ -1,3 +1,5 @@
 .DS_Store
 node_modules/
 .env
+*.blend1
+__pycache__/
