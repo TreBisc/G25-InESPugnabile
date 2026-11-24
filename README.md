@@ -3,21 +3,30 @@
 Cassaforte IoT stampabile in 3D: serratura motorizzata (servo **o** stepper), display LCD,
 tastierino, lettore RFID, sensore di peso interno e sensore di porta chiusa.
 
-![Assemblato](cad/render/01_assemblato.png)
+![Assemblato](stampa/cad/render/01_assemblato.png)
 
 ## Struttura
 
+| Cartella | Contenuto |
+|---|---|
+| `stampa/` | Tutto ciò che serve a stampare la cassaforte: modello CAD, render e STL |
+| `brand/` | Identità del brand: regole (`BRAND.md`), loghi, pattern, mascotte e design token |
+| `software/` | Codice del progetto (firmware, backend, dashboard…) |
+| `Internet Of Things/` | Teoria, slide e laboratori del corso |
+
+### `stampa/`
+
 | Percorso | Contenuto |
 |---|---|
-| `cad/genera_cassaforte.py` | Generatore parametrico Blender (tutte le misure in cima al file) |
-| `cad/caveu_cassaforte.blend` | Modello assemblato, con i componenti elettronici di riferimento |
-| `cad/render/` | Render di controllo |
-| `stl/` | Parti già orientate per la stampa (mm) |
+| `stampa/cad/genera_cassaforte.py` | Generatore parametrico Blender (tutte le misure in cima al file) |
+| `stampa/cad/caveu_cassaforte.blend` | Modello assemblato, con i componenti elettronici di riferimento |
+| `stampa/cad/render/` | Render di controllo |
+| `stampa/stl/` | Parti già orientate per la stampa (mm) |
 
-Per rigenerare tutto dopo aver cambiato un parametro:
+Per rigenerare tutto dopo aver cambiato un parametro (dalla cartella principale del progetto):
 
 ```bash
-/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python cad/genera_cassaforte.py
+/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python stampa/cad/genera_cassaforte.py
 ```
 
 ## Dimensioni

@@ -1,0 +1,19 @@
+:root {
+  /* InESPugnabile — design tokens */
+  --ink: #111214;          /* Inchiostro: testo, fondi scuri */
+  --blue: #1F4BFF;          /* Blu Elettrico: colore di marca */
+  --blue-on-dark: #6F8BFF; /* "ESP" e link su fondo Inchiostro */
+  --paper: #F4F4F2;         /* Carta: fondo chiaro */
+  --mist: #D9DAD6;         /* Nebbia: linee, bordi, separatori */
+  --alarm: #E5484D;        /* Rosso Allarme: SOLO errori, PIN errato, intrusione */
+  --white: #FFFFFF;
+  --text-2: #55585C;     /* testo secondario su chiaro */
+
+  --font-display: 'Manrope', system-ui, sans-serif;  /* 800, tracking -0.045em */
+  --font-body: 'Inter', system-ui, sans-serif;       /* 400 / 600 */
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --r-sm: 8px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+}
+/* @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;800&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap'); */
