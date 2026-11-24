@@ -28,7 +28,12 @@ os.makedirs(RENDER_DIR, exist_ok=True)
 # PARAMETRI PRINCIPALI
 # --------------------------------------------------------------------------
 W, D, H = 200.0, 170.0, 160.0      # corpo esterno
-T = 5.0                            # spessore pareti corpo
+T = 3.0                            # spessore pareti corpo (laterali, cielo, retro)
+T_FLOOR = 4.0                      # spessore fondo (copre la sede del dado M3)
+XIN = W / 2 - T                    # faccia interna delle pareti laterali
+R_EDGE = 6.0                       # raggio spigoli lungo la profondita' (corpo e porta)
+CH_BACK = 3.0                      # smusso perimetro posteriore corpo
+CH_FRONT = 1.5                     # smusso perimetro frontale porta
 DOOR_T = 25.0                      # spessore totale porta (guscio + coperchio)
 COVER_T = 3.0                      # coperchio posteriore porta
 SHELL_T = 3.0                      # pareti guscio porta
@@ -136,6 +141,45 @@ def prism(name, pts, a0, a1, plane='XZ', coll=None):
     bmesh.ops.triangulate(bm, faces=caps)
     return bm_to_obj(bm, name, coll or TMP)
 
+def rrect_pts(u0, u1, v0, v1, r, seg=10):
+    """Rettangolo con angoli raccordati di raggio r (antiorario)."""
+    r = max(0.0, min(r, (u1 - u0) / 2 - 1e-3, (v1 - v0) / 2 - 1e-3))
+    if r < 1e-3:
+        return [(u0, v0), (u1, v0), (u1, v1), (u0, v1)]
+    pts = []
+    for cu, cv, a0 in ((u1 - r, v0 + r, -90), (u1 - r, v1 - r, 0), (u0 + r, v1 - r, 90), (u0 + r, v0 + r, 180)):
+        for k in range(seg + 1):
+            a = math.radians(a0 + 90 * k / seg)
+            pts.append((cu + r * math.cos(a), cv + r * math.sin(a)))
+    return pts
+
+def hull_obj(name, pts3, coll=None):
+    bm = bmesh.new()
+    vs = [bm.verts.new(p) for p in pts3]
+    res = bmesh.ops.convex_hull(bm, input=vs)
+    bmesh.ops.delete(bm, geom=[g for g in res["geom_interior"] + res["geom_unused"]
+                               if isinstance(g, bmesh.types.BMVert)], context='VERTS')
+    bmesh.ops.dissolve_limit(bm, angle_limit=math.radians(0.5), verts=bm.verts, edges=bm.edges)
+    bmesh.ops.triangulate(bm, faces=bm.faces)
+    return bm_to_obj(bm, name, coll or TMP)
+
+def rounded_slab(name, x0, x1, z0, z1, r, sections, coll=None):
+    """Lastra con profilo XZ raccordato (raggio r) estrusa lungo Y.
+    sections = [(y, inset), ...]: a ogni quota y il profilo e' rientrato di 'inset' (smussi a 45 gradi)."""
+    pts3 = []
+    for y, ins in sections:
+        pts3 += [(u, y, v) for u, v in rrect_pts(x0 + ins, x1 - ins, z0 + ins, z1 - ins, r - ins)]
+    return hull_obj(name, pts3, coll)
+
+def cbox(name, x0, x1, y0, y1, z0, z1, c, coll=None):
+    """Scatola con tutti i 12 spigoli smussati di c."""
+    pts3 = []
+    for X, sx in ((x0, 1), (x1, -1)):
+        for Y, sy in ((y0, 1), (y1, -1)):
+            for Z, sz in ((z0, 1), (z1, -1)):
+                pts3 += [(X, Y + sy * c, Z + sz * c), (X + sx * c, Y, Z + sz * c), (X + sx * c, Y + sy * c, Z)]
+    return hull_obj(name, pts3, coll)
+
 def apply_mods(ob):
     dg = bpy.context.evaluated_depsgraph_get()
     me = bpy.data.meshes.new_from_object(ob.evaluated_get(dg))
@@ -239,21 +283,27 @@ def tag(ob, rgba, coll=None):
 # --------------------------------------------------------------------------
 # 1) CORPO
 # --------------------------------------------------------------------------
-body = box("corpo", -W / 2, W / 2, 0, D, 0, H)
-cut(body, box("cav", -W / 2 + T, W / 2 - T, -1, D - T, T, H - T))
+body = rounded_slab("corpo", -W / 2, W / 2, 0, H, R_EDGE,
+                    [(0, 0), (D - CH_BACK, 0), (D, CH_BACK)])
+# cavita' con raccordi concentrici: pareti di spessore uniforme anche negli angoli
+cav_pts = rrect_pts(-XIN, XIN, T_FLOOR, H - T, R_EDGE - T)
+cut(body, hull_obj("cav", [(u, y, v) for y in (-1, D - T) for u, v in cav_pts]))
 
 parts = []
 # guide per il pannello del vano elettronica (canale 3.4 mm a y=129..132.4)
 for sx in (-1, 1):
-    x0, x1 = (91.0, 95.5) if sx > 0 else (-95.5, -91.0)
-    parts += [box("rib", x0, x1, 127.0, 129.0, T - 0.5, H - T + 0.5),
-              box("rib", x0, x1, 132.4, 134.4, T - 0.5, H - T + 0.5)]
+    x0, x1 = (91.0, XIN + 0.5) if sx > 0 else (-XIN - 0.5, -91.0)
+    parts += [box("rib", x0, x1, 127.0, 129.0, T_FLOOR - 0.5, H - T + 0.5),
+              box("rib", x0, x1, 132.4, 134.4, T_FLOOR - 0.5, H - T + 0.5)]
+    # nervatura di irrigidimento delle pareti laterali (verticale in stampa)
+    xr0, xr1 = (XIN - 4.0, XIN + 0.5) if sx > 0 else (-XIN - 0.5, -XIN + 4.0)
+    parts.append(box("nervatura", xr0, xr1, 50.0, 127.5, 108.0, 112.0))
 # blocco riscontro del chiavistello (parete destra)
-parts.append(box("riscontro", 83.0, 95.5, 20.0, 45.0, 64.0, 94.0))
+parts.append(box("riscontro", 83.0, XIN + 0.5, 20.0, 45.0, 64.0, 94.0))
 # supporto sensore hall porta chiusa
-parts.append(box("hall", 86.0, 95.5, 1.0, 12.0, 118.0, 148.0))
+parts.append(box("hall", 86.0, XIN + 0.5, 1.0, 12.0, 118.0, 148.0))
 # nocche cerniera lato corpo
-for z0, z1 in ((T, 45.0), (115.0, H - T)):
+for z0, z1 in ((6.0, 45.0), (115.0, H - 6.0)):
     parts.append(cyl("nocca", (HX, HY), KN_R, 'Z', z0, z1))
     parts.append(box("ponte", HX, -99.5, HY, 8.0, z0, z1))
 fuse(body, parts)
@@ -269,9 +319,9 @@ holes = [
 for i in range(-4, 5):  # feritoie di ventilazione posteriori
     holes.append(box("vent", i * 8 - 1.5, i * 8 + 1.5, D - T - 1, D + 1, 115.0, 140.0))
 for sx in (-1, 1):
-    holes.append(cyl("vite_base", (sx * 45.0, LC_Y), 1.7, 'Z', -1, T + 1, seg=32))
+    holes.append(cyl("vite_base", (sx * 45.0, LC_Y), 1.7, "Z", -1, T_FLOOR + 1, seg=32))
     holes.append(cyl("dado_base", (sx * 45.0, LC_Y), 3.75, 'Z', -0.1, 2.6, seg=6))
-    holes.append(cyl("ancoraggio", (sx * 60.0, 148.0), 3.25, 'Z', -1, T + 1, seg=32))
+    holes.append(cyl("ancoraggio", (sx * 60.0, 148.0), 3.25, "Z", -1, T_FLOOR + 1, seg=32))
     for fy in (15.0, 155.0):
         holes.append(cyl("piedino", (sx * 85.0, fy), 6.0, 'Z', -0.1, 1.0, seg=48))
 cut(body, holes)
@@ -283,8 +333,10 @@ tag(body, (0.16, 0.17, 0.19, 1), C_PRINT)
 YF = -DOOR_T                 # faccia frontale porta
 YB = -COVER_T                # retro guscio (appoggio coperchio)
 YI = YF + SHELL_T            # faccia interna della parete frontale
-door = box("porta_guscio", DX0, DX1, YF, YB, 0, H)
-cut(door, box("int", DX0 + SHELL_T, DX1 - SHELL_T, YI, YB + 1, SHELL_T, H - SHELL_T))
+door = rounded_slab("porta_guscio", DX0, DX1, 0, H, R_EDGE,
+                    [(YF, CH_FRONT), (YF + CH_FRONT, 0), (YB, 0)])
+cut(door, rounded_slab("int", DX0 + SHELL_T, DX1 - SHELL_T, SHELL_T, H - SHELL_T, R_EDGE - SHELL_T,
+                       [(YI, 0), (YB + 1, 0)]))
 
 BOSS = [(-90.0, 9.0), (91.0, 9.0), (-90.0, 151.0), (91.0, 151.0)]
 LCD_HOLES = [(CX + sx * 37.5, LCD_Z + sz * 15.5) for sx in (-1, 1) for sz in (-1, 1)]
@@ -299,7 +351,11 @@ holes = [cyl("pilota", p, 1.4, 'Y', YI + 3, YB + 0.1, seg=24) for p in BOSS]
 holes += [cyl("pilota_lcd", p, 1.1, 'Y', YI, YI + 4.1, seg=24) for p in LCD_HOLES]
 holes += [
     box("finestra_lcd", CX - 36, CX + 36, YF - 1, YI + 0.1, LCD_Z - 12.5, LCD_Z + 12.5),
-    box("incasso_tastierino", CX - 35, CX + 35, YF - 0.1, YF + 1.0, KEY_Z - 39, KEY_Z + 39),
+    # smusso 1 mm attorno alla finestra LCD
+    rounded_slab("smusso_lcd", CX - 37.2, CX + 37.2, LCD_Z - 13.7, LCD_Z + 13.7, 1.5,
+                 [(YF - 0.2, 0), (YF + 1.0, 1.2)]),
+    rounded_slab("incasso_tastierino", CX - 35, CX + 35, KEY_Z - 39, KEY_Z + 39, 2.5,
+                 [(YF - 0.1, 0), (YF + 1.0, 0)]),
     box("slot_flat", CX - 11, CX + 11, YF - 1, YI + 0.1, KEY_Z - 38.5, KEY_Z - 35.5),
     cyl("led_rosso", (CX - 20, 150.0), 2.6, 'Y', YF - 1, YI + 0.1, seg=32),
     cyl("led_verde", (CX + 20, 150.0), 2.6, 'Y', YF - 1, YI + 0.1, seg=32),
@@ -315,14 +371,14 @@ ring = box("cornice_rfid", -88.0, -56.0, YF - 0.6, YF + 0.6, 50.0, 90.0)
 cut(ring, box("ci", -86.8, -57.2, YF - 1, YF + 1, 51.2, 88.8))
 holes.append(ring)
 holes.append(text_tool("RFID", 5.0, -72.0, YF, 70.0, 0.6))
-holes.append(text_tool("CAVEU IOT", 6.0, CX, YF, 105.5, 0.6))
+holes.append(text_tool("CAVEU IOT", 7.0, CX, YF, 107.5, 0.8))
 cut(door, holes)
 tag(door, (0.22, 0.24, 0.28, 1), C_PRINT)
 
 # --------------------------------------------------------------------------
 # 3) PORTA - COPERCHIO POSTERIORE CON GUIDE DEL CHIAVISTELLO
 # --------------------------------------------------------------------------
-cover = box("porta_coperchio", DX0, DX1, YB, 0, 0, H)
+cover = rounded_slab("porta_coperchio", DX0, DX1, 0, H, R_EDGE, [(YB, 0), (0, 0)])
 fuse(cover, [
     box("guida_1", 34.0, 42.0, -0.5, 39.0, 70.0, 92.0),
     box("guida_2", 68.0, 76.0, -0.5, 39.0, 70.0, 92.0),
@@ -340,6 +396,10 @@ holes += [
     cyl("pilota_fc1", (1.25, 81.0), 0.9, 'Y', 17.0, 27.5, seg=16),
     cyl("pilota_fc2", (10.75, 81.0), 0.9, 'Y', 17.0, 27.5, seg=16),
 ]
+# tasche di alleggerimento (lato interno, in alto in stampa): lasciano 1.5 mm di fondo
+holes += [rounded_slab("tasca", x0, x1, z0, z1, 3.0, [(-COVER_T / 2, 0), (0.1, 0)])
+          for x0, x1, z0, z1 in ((-88.0, -8.0, 92.0, 142.0), (-4.0, 80.0, 98.0, 142.0),
+                                 (-88.0, -8.0, 18.0, 68.0))]
 cut(cover, holes)
 tag(cover, (0.90, 0.47, 0.12, 1), C_PRINT)
 
@@ -401,9 +461,9 @@ tag(st, (0.20, 0.45, 0.85, 1), C_ALT)
 # --------------------------------------------------------------------------
 # 6) MANIGLIA
 # --------------------------------------------------------------------------
-hd = box("maniglia", 76.0, 88.0, YF - 20, YF - 12, 42.0, 118.0)
-fuse(hd, [box("st", 76.0, 88.0, YF - 12.5, YF, 42.0, 54.0),
-          box("st", 76.0, 88.0, YF - 12.5, YF, 106.0, 118.0)])
+hd = cbox("maniglia", 76.0, 88.0, YF - 20, YF - 12, 42.0, 118.0, 1.5)
+fuse(hd, [cbox("st", 76.0, 88.0, YF - 13.0, YF, 42.0, 54.0, 1.5),
+          cbox("st", 76.0, 88.0, YF - 13.0, YF, 106.0, 118.0, 1.5)])
 cut(hd, [cyl("pil", (82.0, z), 1.65, 'Y', YF - 12, YF + 0.1, seg=24) for z in (48.0, 112.0)])
 tag(hd, (0.08, 0.08, 0.09, 1), C_PRINT)
 
@@ -411,31 +471,51 @@ tag(hd, (0.08, 0.08, 0.09, 1), C_PRINT)
 # 7) SENSORE DI PESO: BASE CELLA + PIATTO
 # --------------------------------------------------------------------------
 ly0, ly1 = LC_Y - LC_S / 2, LC_Y + LC_S / 2
-lcb = box("base_cella", -50.0, 50.0, LC_Y - 10, LC_Y + 10, T, T + 3)
-fuse(lcb, box("rialzo", -42.0, -18.0, ly0, ly1, T + 2.5, LC_Z0))
-cut(lcb, [cyl("vf", (sx * 45.0, LC_Y), 1.7, 'Z', T - 1, T + 4, seg=32) for sx in (-1, 1)] +
-    [cyl("vc", (x, LC_Y), 2.2, 'Z', T - 1, LC_Z0 + 1, seg=32) for x in (-35.0, -25.0)] +
-    [cyl("lam", (x, LC_Y), 4.0, 'Z', T - 0.1, T + 3.5, seg=32) for x in (-35.0, -25.0)])
+lcb = box("base_cella", -50.0, 50.0, LC_Y - 10, LC_Y + 10, T_FLOOR, T_FLOOR + 3)
+fuse(lcb, box("rialzo", -42.0, -18.0, ly0, ly1, T_FLOOR + 2.5, LC_Z0))
+cut(lcb, [cyl("vf", (sx * 45.0, LC_Y), 1.7, 'Z', T_FLOOR - 1, T_FLOOR + 4, seg=32) for sx in (-1, 1)] +
+    [cyl("vc", (x, LC_Y), 2.2, 'Z', T_FLOOR - 1, LC_Z0 + 1, seg=32) for x in (-35.0, -25.0)] +
+    [cyl("lam", (x, LC_Y), 4.0, 'Z', T_FLOOR - 0.1, T_FLOOR + 3.5, seg=32) for x in (-35.0, -25.0)])
 tag(lcb, (0.30, 0.65, 0.45, 1), C_PRINT)
 
 LC_TOP = LC_Z0 + LC_S
 PL_Z0 = LC_TOP + 4
-plat = box("piatto_peso", -88.0, 88.0, 9.0, 121.0, PL_Z0, PL_Z0 + 4)
-rim = box("bordo", -88.0, 88.0, 9.0, 121.0, PL_Z0 + 3.5, PL_Z0 + 7)
-cut(rim, box("bi", -86.0, 86.0, 11.0, 119.0, PL_Z0 + 3, PL_Z0 + 8))
-fuse(plat, [rim, box("distanziale", 18.0, 42.0, ly0, ly1, LC_TOP, PL_Z0 + 0.5)])
-cut(plat, [cyl("vp", (x, LC_Y), 2.65, 'Z', LC_TOP - 1, PL_Z0 + 5, seg=32) for x in (25.0, 35.0)] +
-    [cyl("sv", (x, LC_Y), 2.65, 'Z', PL_Z0 + 4 - 2.4, PL_Z0 + 4.01, r2=5.0, seg=32) for x in (25.0, 35.0)])
+PL_TOP = PL_Z0 + 4                    # faccia superiore del piano (invariata)
+PL_PLATE = 2.0                        # piano sottile + nervature sotto
+def rr_z(name, x0, x1, y0, y1, z0, z1, r):
+    return hull_obj(name, [(u, v, z) for z in (z0, z1) for u, v in rrect_pts(x0, x1, y0, y1, r)])
+plat = rr_z("piatto_peso", -88.0, 88.0, 9.0, 121.0, PL_TOP - PL_PLATE, PL_TOP, 4.0)
+rim = rr_z("bordo", -88.0, 88.0, 9.0, 121.0, PL_TOP - 0.5, PL_Z0 + 7, 4.0)
+cut(rim, rr_z("bi", -86.0, 86.0, 11.0, 119.0, PL_TOP - 1, PL_Z0 + 8, 2.0))
+# nervature sotto il piano, alte fino al piano di appoggio del distanziale (stampa senza supporti)
+z_rib0, z_rib1 = LC_TOP, PL_TOP - PL_PLATE + 0.1
+frame = rr_z("telaio", -88.0, 88.0, 9.0, 121.0, z_rib0, z_rib1, 4.0)
+cut(frame, rr_z("ti", -86.0, 86.0, 11.0, 119.0, z_rib0 - 1, z_rib1 + 1, 2.0))
+ribs = [frame]
+ribs += [box("nerv_x", -87.0, 87.0, y - 1, y + 1, z_rib0, z_rib1) for y in (37.0, 93.0)]
+ribs += [box("nerv_y", x - 1, x + 1, 10.0, 120.0, z_rib0, z_rib1) for x in (-66.0, -33.0, 0.0, 33.0, 66.0)]
+fuse(plat, [rim] + ribs)
+# nessuna nervatura deve toccare la cella: solo il distanziale la tocca
+cut(plat, box("luce_cella", -46.0, 46.0, ly0 - 4, ly1 + 4, z_rib0 - 1, PL_TOP - PL_PLATE))
+fuse(plat, box("distanziale", 18.0, 42.0, ly0, ly1, LC_TOP, PL_TOP - PL_PLATE + 0.5))
+cut(plat, [cyl("vp", (x, LC_Y), 2.65, 'Z', LC_TOP - 1, PL_TOP + 1, seg=32) for x in (25.0, 35.0)] +
+    [cyl("sv", (x, LC_Y), 2.65, 'Z', PL_TOP - 2.4, PL_TOP + 0.01, r2=5.0, seg=32) for x in (25.0, 35.0)])
 tag(plat, (0.30, 0.65, 0.45, 1), C_PRINT)
 
 # --------------------------------------------------------------------------
 # 8) PANNELLO VANO ELETTRONICA (scorre nelle guide posteriori)
 # --------------------------------------------------------------------------
-pn = box("pannello_elettronica", -94.6, 94.6, 129.3, 132.1, T + 0.5, 152.0)
+pn = box("pannello_elettronica", -94.6, 94.6, 129.3, 132.1, T_FLOOR + 0.5, 152.0)
 PB = [(sx * 23.0, z) for sx in (-1, 1) for z in (27.0, 93.0)]
 fuse(pn, [cyl("so", q, 3.0, 'Y', 131.6, 137.0, seg=32) for q in PB])
+# asole di ventilazione/alleggerimento ai lati della millefori
+slots = []
+for sx in (-1, 1):
+    for i in range(5):
+        xc = sx * (44.0 + i * 9.0)
+        slots.append(rounded_slab("asola", xc - 2.5, xc + 2.5, 20.0, 128.0, 2.5, [(129.0, 0), (133.0, 0)]))
 cut(pn, [box("passacavi", -20.0, 20.0, 129.0, 133.0, 30.0, 44.0),
-         box("presa", -15.0, 15.0, 129.0, 133.0, 140.0, 147.0)] +
+         box("presa", -15.0, 15.0, 129.0, 133.0, 140.0, 147.0)] + slots +
     [cyl("pil", q, 1.1, 'Y', 132.5, 137.1, seg=16) for q in PB])
 tag(pn, (0.78, 0.79, 0.80, 1), C_PRINT)
 
@@ -482,7 +562,7 @@ PRINT_ORIENT = {
     "supporto_stepper": RX(90),
     "maniglia": RY(90),
     "base_cella": Matrix.Identity(4),
-    "piatto_peso": RX(180),        # bordo sul piatto, distanziale verso l'alto
+    "piatto_peso": Matrix.Identity(4),  # nervature e distanziale sul piatto, bordo verso l'alto
     "pannello_elettronica": RX(90),
 }
 
@@ -519,6 +599,8 @@ for name, rot in PRINT_ORIENT.items():
         e, v, t = found
         _, nv = bmesh.utils.edge_split(e, e.verts[0], t)
         bmesh.ops.pointmerge(bm, verts=[nv, v], merge_co=v.co.copy())
+    non_manifold = sum(1 for e in bm.edges if not e.is_manifold)
+    vol_cm3 = abs(bm.calc_volume()) / 1000.0
     bm.to_mesh(src.data)
     bm.free()
     me = src.data.copy()
@@ -534,13 +616,18 @@ for name, rot in PRINT_ORIENT.items():
     bpy.ops.wm.stl_export(filepath=os.path.join(STL_DIR, name + ".stl"),
                           export_selected_objects=True, ascii_format=False, global_scale=1.0)
     dims = (max(xs) - min(xs), max(ys) - min(ys), max(zs) - min(zs))
-    report.append((name, dims, len(me.polygons)))
+    report.append((name, dims, len(me.polygons), vol_cm3, non_manifold))
     bpy.data.objects.remove(tmp, do_unlink=True)
     bpy.data.meshes.remove(me)
 
-print("\n=== PARTI ESPORTATE (ingombro di stampa mm) ===")
-for name, d, nf in report:
-    print(f"{name:24s} {d[0]:7.1f} x {d[1]:7.1f} x {d[2]:7.1f}   facce={nf}")
+print("\n=== PARTI ESPORTATE (ingombro di stampa mm, volume pieno) ===")
+tot = 0.0
+for name, d, nf, vol, nm in report:
+    print(f"{name:24s} {d[0]:7.1f} x {d[1]:7.1f} x {d[2]:7.1f}   {vol:7.1f} cm3 ~{vol * 1.24:5.0f} g PLA"
+          f"   facce={nf}  non-manifold={nm}")
+    if "stepper" not in name:
+        tot += vol
+print(f"TOTALE (versione servo): {tot:.1f} cm3 ~{tot * 1.24:.0f} g PLA pieni")
 
 # --------------------------------------------------------------------------
 # 11) RENDER DI CONTROLLO + SALVATAGGIO
@@ -558,6 +645,9 @@ sh.color_type = 'OBJECT'
 sh.show_cavity = True
 sh.cavity_type = 'BOTH'
 sh.show_object_outline = True
+sh.show_shadows = True
+sh.shadow_intensity = 0.35
+sh.show_specular_highlight = True
 scene.render.resolution_x, scene.render.resolution_y = 1400, 1000
 scene.render.film_transparent = False
 

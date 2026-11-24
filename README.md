@@ -22,7 +22,8 @@ Per rigenerare tutto dopo aver cambiato un parametro:
 
 ## Dimensioni
 
-- Corpo: 200 × 170 × 160 mm (214 mm di larghezza con la cerniera), pareti da 5 mm
+- Corpo: 200 × 170 × 160 mm (214 mm di larghezza con la cerniera), pareti da 3 mm, fondo da 4 mm,
+  spigoli raccordati R6 e retro smussato
 - Porta: 25 mm di spessore totale (guscio frontale + coperchio posteriore da 3 mm)
 - Piatto di stampa minimo: **215 × 165 mm** (corpo e porta). Va bene per Ender 3, Prusa MK4,
   Bambu A1/P1/X1. Non entra su piatti 180 × 180.
@@ -40,11 +41,43 @@ Per rigenerare tutto dopo aver cambiato un parametro:
 | `supporto_servo.stl` | 51 × 26 × 20 | **oppure** `supporto_stepper.stl` |
 | `supporto_stepper.stl` | 54 × 22 × 22 | stessi 2 fori di fissaggio del supporto servo |
 | `maniglia.stl` | 76 × 20 × 12 | |
-| `base_cella.stl` | 100 × 20 × 7 | si avvita al fondo |
-| `piatto_peso.stl` | 176 × 112 × 11 | appoggia sulla cella di carico |
-| `pannello_elettronica.stl` | 189 × 147 × 8 | scorre nelle guide, chiude il vano posteriore |
+| `base_cella.stl` | 100 × 20 × 8 | si avvita al fondo |
+| `piatto_peso.stl` | 176 × 112 × 11 | piano da 2 mm con nervature sotto, si stampa nervature sul piatto |
+| `pannello_elettronica.stl` | 189 × 148 × 8 | scorre nelle guide, chiude il vano posteriore, asole di ventilazione |
 
-Consigliato: PETG o PLA+, 4 perimetri, 25–40% infill (corpo e porta), 100% per pignone e chiavistello.
+Impostazioni di stampa: vedi [Stampa economica](#stampa-economica).
+
+## Stampa economica
+
+Il modello è stato alleggerito senza cambiare misure esterne né posizione dei componenti:
+
+| Parte | Prima | Ora | Cosa è cambiato |
+|---|---|---|---|
+| corpo | 768 cm³ | 515 cm³ | pareti 5 → 3 mm (fondo 4 mm), nervature laterali |
+| porta_coperchio | 116 cm³ | 98 cm³ | tre tasche di alleggerimento profonde 1.5 mm |
+| piatto_peso | 83 cm³ | 61 cm³ | piano 4 → 2 mm con griglia di nervature |
+| pannello_elettronica | 76 cm³ | 62 cm³ | 10 asole di ventilazione |
+| **totale (versione servo)** | **1210 cm³** | **900 cm³** | **−26% di materiale pieno** |
+
+I volumi sono "pieni": il filamento reale dipende dallo slicer. Con le impostazioni sotto
+il set completo pesa indicativamente 0.9–1 kg di PLA (prima 1.2–1.3 kg con 4 perimetri e 25–40%).
+Il report del generatore stampa volume e grammi pieni di ogni parte.
+
+Impostazioni consigliate (ugello 0.4 mm, valide per qualsiasi slicer):
+
+| Parti | Layer | Perimetri | Sopra/sotto | Infill |
+|---|---|---|---|---|
+| corpo, porta_guscio, porta_coperchio, pannello, piatto | 0.24–0.28 mm | 3 | 4 strati | 10% gyroid |
+| supporto motore, base cella, maniglia | 0.2 mm | 3 | 4 strati | 30% |
+| pignone, chiavistello | 0.2 mm | 6 (o 100%) | — | 100% |
+
+- Con pareti da 3 mm e 3 perimetri le pareti sono quasi tutte perimetro: l'infill serve solo
+  in boss, blocchi e fondo, quindi abbassarlo oltre il 10% cambia poco.
+- PLA basta per la demo e costa meno del PETG; PETG se deve durare o stare al sole.
+- Stampa un solo supporto motore e un solo pignone (servo **oppure** stepper).
+- Nessuna parte richiede supporti: gli smussi a 45° sulle facce appoggiate al piatto evitano anche
+  il sollevamento degli angoli.
+- Per risparmiare tempo: ugello 0.6 mm con layer 0.3 mm su corpo e porta.
 
 ## Componenti elettronici previsti
 
