@@ -1,4 +1,4 @@
-# Caveu IOT — Cose da fare e informazioni
+# InESPugnabile — Cose da fare e informazioni
 
 Progetto d'esame del corso **Internet of Things**: cassaforte IoT stampabile in 3D.
 
@@ -28,8 +28,7 @@ Progetto d'esame del corso **Internet of Things**: cassaforte IoT stampabile in 
 ## Informazioni generali
 
 - Repository: [TreBisc/Caveu-IOT](https://github.com/TreBisc/Caveu-IOT) (privata)
-- Teoria e laboratori del corso: cartella `Internet Of Things/` sul branch `main`
-- Bozza del modello 3D: `stampa/` (CAD, render e STL) sul branch `feat/modello-3d-cassaforte`
-  (dettagli nel `README.md` di quel branch)
+- Teoria, slide e laboratori del corso: cartella superiore `Internet Of Things/`, fuori dal repository
+- Modello 3D: `stampa/`, da rifare da zero (la prima bozza è nella cronologia git, commit `702a7d1`)
 - Identità del brand: `brand/` (leggere prima `brand/BRAND.md`)
 - Codice: `software/`
