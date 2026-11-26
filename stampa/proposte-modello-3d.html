@@ -1,0 +1,660 @@
+<title>Proposte caveau InESPugnabile</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;800&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una colonna di tavole tecniche su Carta; ogni proposta = disegno in scala (mm) + legenda numerata + scheda */
+:root{
+  --bg:#F4F4F2; --surface:#FFFFFF; --fg:#111214; --fg-2:#55585C; --line:#D9DAD6;
+  --accent:#1F4BFF; --accent-soft:#E8EDFF;
+  --edge:#111214; --sec:#E6E7E3; --cav:#FFFFFF; --bay:#E8EDFF; --comp:#C7D3FF; --comp-edge:#1F4BFF;
+  --hid:#7D8187; --mk-bg:#1F4BFF; --mk-fg:#FFFFFF;
+  /* colori dei filamenti: uguali in entrambi i temi */
+  --pla-nero:#1C1D20; --pla-bianco:#F4F4F2; --pla-blu:#1F4BFF;
+  --screen:#08090B; --pix:#E6EBFF; --hole-l:#111214; --hole-d:#5A5D62; --wave:#4467FF; --seam:#45484D; --groove:#C9CAC6;
+  --led-r:#E5484D; --led-y:#F2C230; --led-b:#4D7BFF; --on-blue:#FFFFFF;
+  --font-display:'Manrope','Arial Black',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111214; --surface:#1A1B1E; --fg:#FFFFFF; --fg-2:#A3A6AB; --line:#2A2B2E;
+  --accent:#6F8BFF; --accent-soft:#1D2547;
+  --edge:#8C9096; --sec:#25262A; --cav:#141518; --bay:#1B2244; --comp:#2B3A7A; --comp-edge:#6F8BFF;
+  --hid:#8C9096; --mk-bg:#6F8BFF; --mk-fg:#111214; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#111214; --surface:#1A1B1E; --fg:#FFFFFF; --fg-2:#A3A6AB; --line:#2A2B2E;
+  --accent:#6F8BFF; --accent-soft:#1D2547;
+  --edge:#8C9096; --sec:#25262A; --cav:#141518; --bay:#1B2244; --comp:#2B3A7A; --comp-edge:#6F8BFF;
+  --hid:#8C9096; --mk-bg:#6F8BFF; --mk-fg:#111214; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 72px;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5.2vw,56px)}
+h2{font-size:clamp(26px,3.4vw,36px)}
+h3{font-size:24px}
+p{margin:0}
+.label{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--fg-2)}
+.label.blue{color:var(--accent)}
+.lead{font-size:18px;color:var(--fg-2);max-width:62ch}
+section{display:flex;flex-direction:column;gap:20px}
+.sec-head{display:flex;flex-direction:column;gap:8px}
+
+/* header */
+header{display:flex;flex-direction:column;gap:20px}
+.brandrow{display:flex;align-items:center;gap:10px}
+.brandrow svg{height:30px;width:auto;color:var(--accent)}
+.logotype{font-family:var(--font-display);font-weight:800;letter-spacing:-.045em;font-size:22px}
+.logotype b{color:var(--accent);font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--font-mono);font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+
+/* tabelle */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:20px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+thead th{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--fg-2)}
+td.mono,.mono{font-family:var(--font-mono);font-size:13px;font-variant-numeric:tabular-nums}
+td:first-child{font-weight:600}
+
+/* proposte */
+.props{display:flex;flex-direction:column;gap:32px}
+.prop{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:24px}
+.prop-head{display:flex;gap:16px;align-items:flex-start}
+.letter{flex:none;width:44px;height:44px;border-radius:14px;background:var(--mk-bg);color:var(--mk-fg);
+  font-family:var(--font-display);font-weight:800;font-size:22px;display:grid;place-items:center}
+.prop-head .t{display:flex;flex-direction:column;gap:6px;min-width:0}
+.prop-head p{color:var(--fg-2);max-width:68ch}
+.figwrap{overflow-x:auto;background:var(--bg);border-radius:14px;padding:16px}
+.figwrap svg{display:block;width:100%;min-width:540px;height:auto}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}
+@media (max-width:760px){.cols{grid-template-columns:minmax(0,1fr)}}
+.legend{list-style:none;margin:0;padding:0;counter-reset:mk;display:flex;flex-direction:column;gap:10px;font-size:15px}
+.legend li{counter-increment:mk;display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:start}
+.legend li::before{content:counter(mk);width:22px;height:22px;border-radius:50%;background:var(--mk-bg);color:var(--mk-fg);
+  font-weight:600;font-size:12px;display:grid;place-items:center;margin-top:1px}
+.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:10px 16px;margin:0;font-size:15px}
+.facts dt{font-family:var(--font-mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--fg-2);padding-top:3px}
+.facts dd{margin:0}
+.sw{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid var(--edge);vertical-align:-1px;margin-right:6px}
+.sw.n{background:var(--pla-nero)} .sw.b{background:var(--pla-bianco)} .sw.u{background:var(--pla-blu)}
+.side{display:flex;flex-direction:column;gap:24px}
+.pc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:520px){.pc{grid-template-columns:minmax(0,1fr)}}
+.pc ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+
+/* confronto */
+.dots{font-family:var(--font-mono);letter-spacing:.15em;color:var(--accent);white-space:nowrap}
+.dots i{font-style:normal;color:var(--line)}
+.pick{background:var(--pla-blu);color:var(--on-blue);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:10px}
+.pick .label{color:var(--on-blue);opacity:.85}
+.pick p{max-width:70ch}
+
+/* regole e piano */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.rule h3{font-size:18px;letter-spacing:-.02em}
+.rule p{color:var(--fg-2);font-size:15px}
+.steps{list-style:none;margin:0;padding:0;counter-reset:st;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:20px;background:var(--surface)}
+.steps li{counter-increment:st;display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(st);font-family:var(--font-mono);font-size:13px;color:var(--accent);padding-top:3px}
+.steps b{font-weight:600}
+.steps span{color:var(--fg-2)}
+.qs{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;max-width:75ch}
+.qs li::marker{font-family:var(--font-mono);color:var(--accent)}
+
+/* svg */
+.cap{font-family:var(--font-mono);font-size:7px;letter-spacing:.13em;fill:var(--fg-2)}
+.m-nero{fill:var(--pla-nero);stroke:var(--edge);stroke-width:1}
+.m-bianco{fill:var(--pla-bianco);stroke:var(--edge);stroke-width:1}
+.m-blu{fill:var(--pla-blu);stroke:var(--edge);stroke-width:1;stroke-linejoin:round}
+.c-blu{color:var(--pla-blu)} .c-bianco{color:var(--pla-bianco)}
+.seam{fill:none;stroke:var(--seam);stroke-width:.8}
+.screen{fill:var(--screen);stroke:var(--seam);stroke-width:.8}
+.pix{fill:var(--pix)}
+.diff{fill:var(--pla-bianco);stroke:var(--edge);stroke-width:.6}
+.lr{fill:var(--led-r)} .ly{fill:var(--led-y)} .lb{fill:var(--led-b)}
+.slot-d{fill:none;stroke:var(--hole-d);stroke-width:2.2;stroke-linecap:round}
+.slot-l{fill:none;stroke:var(--hole-l);stroke-width:2.2;stroke-linecap:round}
+.hole-l{fill:var(--hole-l)} .hole-d{fill:var(--hole-d)}
+.hid{fill:none;stroke:var(--hid);stroke-width:.9;stroke-dasharray:3 2}
+.sec{fill:var(--sec);stroke:var(--edge);stroke-width:1}
+.cav{fill:var(--cav);stroke:var(--edge);stroke-width:.6}
+.bay{fill:var(--bay);stroke:var(--comp-edge);stroke-width:.6;stroke-dasharray:3 2}
+.comp{fill:var(--comp);stroke:var(--comp-edge);stroke-width:.8}
+.gap{fill:var(--bg)}
+.rack{fill:none;stroke:var(--fg);stroke-width:2.2;stroke-dasharray:1.6 1.6}
+.arm{fill:none;stroke:var(--fg);stroke-width:2.2;stroke-linecap:round}
+.wave{fill:none;stroke:var(--wave);stroke-width:1.4}
+.groove{fill:none;stroke:var(--groove);stroke-width:1}
+.arc-edge{fill:none;stroke:var(--edge);stroke-width:11.6;stroke-linecap:round}
+.arc-blu{fill:none;stroke:var(--pla-blu);stroke-width:10;stroke-linecap:round}
+.drawer{fill:none;stroke:var(--pla-blu);stroke-width:2.4}
+.vent{fill:#2A2B2E}
+.mk circle{fill:var(--mk-bg)}
+.mk text{fill:var(--mk-fg);font-family:var(--font-body);font-weight:600;font-size:7.5px;text-anchor:middle;dominant-baseline:central}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="kh" viewBox="14 6 72 93">
+    <path d="M20.06 26.60 A38 38 0 0 1 79.94 26.60" fill="none" stroke="currentColor" stroke-width="6.6" stroke-linecap="round"/>
+    <path d="M31.09 35.22 A24 24 0 0 1 68.91 35.22" fill="none" stroke="currentColor" stroke-width="6.6" stroke-linecap="round"/>
+    <circle cx="50" cy="50" r="13.7" fill="currentColor"/>
+    <path d="M42.4 56 L57.6 56 L63.3 96 L36.7 96 Z" fill="currentColor"/>
+  </symbol>
+</svg>
+
+<div class="wrap">
+
+<header>
+  <div class="brandrow">
+    <svg viewBox="14 6 72 93" aria-hidden="true"><use href="#kh"/></svg>
+    <span class="logotype">In<b>ESP</b>ugnabile</span>
+  </div>
+  <div class="sec-head">
+    <span class="label blue">Stampa · Modello 3D · Bozza del 26 novembre 2026</span>
+    <h1>Quattro proposte per il caveau</h1>
+  </div>
+  <p class="lead">Prima idea della forma, costruita solo sui componenti già sicuri. Ogni proposta ha un disegno in scala (misure in mm), le parti divise per colore e i pro e contro. Alla fine trovi le regole comuni, il piano di lavoro e le domande da chiudere insieme.</p>
+  <div class="chips" aria-label="Componenti già sicuri">
+    <span class="chip">3 LED: rosso · giallo · blu</span>
+    <span class="chip">OLED 0,96"</span>
+    <span class="chip">Servo SG90</span>
+    <span class="chip">Stepper 28BYJ-48</span>
+    <span class="chip">Sensore magnetico</span>
+    <span class="chip">Buzzer</span>
+    <span class="chip">Sensore di luce</span>
+    <span class="chip">Sensore umidità</span>
+    <span class="chip">ESP32 + vano</span>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Ingombri di riferimento</span>
+    <h2>I componenti sicuri</h2>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Componente</th><th>Modello di riferimento</th><th>Ingombro</th><th>Come si monta</th></tr></thead>
+      <tbody>
+        <tr><td>3 LED</td><td>Ø 5 mm del kit</td><td class="mono">Ø5 × 8,6 · flangia Ø5,8</td><td>Foro Ø5,1 da dietro, diffusore bianco a scatto davanti</td></tr>
+        <tr><td>Display</td><td>OLED 0,96" 128×64 I²C (SSD1306, lo usate nel Mini project)</td><td class="mono">scheda 27 × 27 · visibile 22 × 11</td><td>Finestra 24 × 13, clip a scatto: niente viti M2</td></tr>
+        <tr><td>Servo (serratura)</td><td>SG90</td><td class="mono">23 × 12,2 × 29 · alette 32</td><td>Culla a incastro, il chiavistello sulla squadretta</td></tr>
+        <tr><td>Stepper (apertura)</td><td>28BYJ-48 + driver ULN2003</td><td class="mono">Ø28 × 19 · fori a 35 (Ø4,2) · driver ≈ 35 × 32</td><td>2 viti M3 sulle orecchie, driver su pioli stampati</td></tr>
+        <tr><td>Sensore magnetico</td><td>Reed o contatto da porta (da confermare)</td><td class="mono">es. MC-38: 2 × (27 × 14 × 10) · lavora entro ≈ 10–15 mm</td><td>Sensore in una tasca del telaio, magnete nel bordo della porta</td></tr>
+        <tr><td>Buzzer</td><td>Del kit</td><td class="mono">Ø12 × 9,5</td><td>Dietro una griglia ad archi</td></tr>
+        <tr><td>Sensore di luce</td><td>Fotoresistenza GL5528</td><td class="mono">Ø5</td><td>Foro Ø5,2 rivolto verso la luce da misurare</td></tr>
+        <tr><td>Umidità</td><td>DHT22 (lo usate nel Mini project)</td><td class="mono">25 × 15 × 7,7</td><td>Tasca con feritoie verso il caveau</td></tr>
+        <tr><td>ESP32</td><td>DevKit del kit</td><td class="mono">≈ 55 × 28</td><td>Nel vano, su pioli stampati, porta USB verso il foro passacavo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Proposte di design</span>
+    <h2>Quattro forme, stesse regole</h2>
+  </div>
+
+  <div class="props">
+
+  <!-- ===================== A ===================== -->
+  <article class="prop" id="monolite">
+    <div class="prop-head">
+      <span class="letter" aria-hidden="true">A</span>
+      <div class="t">
+        <h3>Monolite</h3>
+        <p>La cassaforte classica, ripulita. Un blocco nero con la porta bianca a battente e il simbolo blu come maniglia. In alto una fascia fissa raccoglie display, LED e buzzer.</p>
+      </div>
+    </div>
+    <div class="figwrap">
+      <svg viewBox="-12 -18 434 240" role="img" aria-label="Proposta A, vista frontale e pianta in sezione">
+        <text class="cap" x="0" y="-7">FRONTE · 180 × 210</text>
+        <text class="cap" x="230" y="-7">PIANTA IN SEZIONE · 180 × 170</text>
+        <!-- fronte -->
+        <rect class="m-nero" x="0" y="0" width="180" height="210" rx="14"/>
+        <rect class="seam" x="10" y="10" width="160" height="44" rx="8"/>
+        <rect class="screen" x="71" y="16" width="38" height="22" rx="3"/>
+        <rect class="pix" x="75" y="20" width="18" height="2.4"/><rect class="pix" x="75" y="25" width="26" height="2.4"/><rect class="pix" x="75" y="30" width="12" height="2.4"/>
+        <circle class="diff" cx="78" cy="46" r="4.2"/><circle class="diff" cx="90" cy="46" r="4.2"/><circle class="diff" cx="102" cy="46" r="4.2"/>
+        <circle class="lr" cx="78" cy="46" r="2.6"/><circle class="ly" cx="90" cy="46" r="2.6"/><circle class="lb" cx="102" cy="46" r="2.6"/>
+        <path class="slot-d" d="M145.27 38.30 A6 6 0 0 1 154.73 38.30"/>
+        <path class="slot-d" d="M141.33 35.22 A11 11 0 0 1 158.67 35.22"/>
+        <rect class="m-bianco" x="10" y="62" width="160" height="138" rx="8"/>
+        <rect class="m-nero" x="2" y="72" width="8" height="16" rx="3"/>
+        <rect class="m-nero" x="2" y="174" width="8" height="16" rx="3"/>
+        <use href="#kh" x="132" y="112" width="26" height="33.6" class="c-blu"/>
+        <circle class="hole-l" cx="145" cy="127.9" r="1.6"/>
+        <rect class="hid" x="2" y="35" width="28" height="19"/>
+        <rect class="hid" x="171" y="92" width="7" height="24"/>
+        <rect class="hid" x="171" y="150" width="7" height="12"/>
+        <g class="mk" transform="translate(118 27)"><circle r="6"/><text>1</text></g>
+        <g class="mk" transform="translate(118 46)"><circle r="6"/><text>2</text></g>
+        <g class="mk" transform="translate(150 22)"><circle r="6"/><text>3</text></g>
+        <g class="mk" transform="translate(122 113)"><circle r="6"/><text>4</text></g>
+        <!-- pianta -->
+        <rect class="sec" x="230" y="0" width="180" height="170" rx="14"/>
+        <rect class="m-nero" x="244" y="0" width="152" height="5" rx="1"/>
+        <rect class="gap" x="378" y="0" width="9" height="5"/>
+        <rect class="bay" x="240" y="9" width="160" height="42" rx="4"/>
+        <rect class="comp" x="250" y="16" width="55" height="28" rx="2"/>
+        <rect class="comp" x="312" y="13" width="35" height="32" rx="2"/>
+        <rect class="hid" x="354" y="13" width="40" height="32" rx="2"/>
+        <rect class="comp" x="296" y="52" width="25" height="8" rx="1"/>
+        <rect class="cav" x="242" y="60" width="154" height="96" rx="6"/>
+        <rect class="comp" x="397" y="112" width="11" height="23" rx="1"/>
+        <rect class="comp" x="398" y="143" width="9" height="9" rx="1"/>
+        <rect class="m-bianco" x="240" y="157" width="158" height="13" rx="2"/>
+        <circle class="comp" cx="244" cy="152" r="14"/>
+        <circle cx="238" cy="160" r="2.4" fill="var(--fg)"/>
+        <g class="mk" transform="translate(268 140)"><circle r="6"/><text>5</text></g>
+        <g class="mk" transform="translate(386 122)"><circle r="6"/><text>6</text></g>
+        <g class="mk" transform="translate(386 148)"><circle r="6"/><text>7</text></g>
+        <g class="mk" transform="translate(330 56)"><circle r="6"/><text>8</text></g>
+        <g class="mk" transform="translate(374 29)"><circle r="6"/><text>9</text></g>
+      </svg>
+    </div>
+    <div class="cols">
+      <ol class="legend">
+        <li>Display OLED nel pannello interfaccia: parte fissa e sostituibile</li>
+        <li>3 LED in fila (rosso, giallo, blu) con diffusori bianchi</li>
+        <li>Griglia del buzzer a forma di archi di segnale</li>
+        <li>Simbolo blu a incastro che fa da maniglia; nella testa della serratura c'è il foro del sensore di luce</li>
+        <li>Stepper sopra la porta: il suo albero è l'asse della cerniera</li>
+        <li>Servo con chiavistello nel montante destro</li>
+        <li>Sensore magnetico nel montante, magnete nel bordo della porta</li>
+        <li>Sensore umidità sulla parete di fondo, con feritoie</li>
+        <li>Vano elettronica dietro il caveau, con spazio di riserva (tratteggio), coperchio posteriore e foro USB</li>
+      </ol>
+      <div class="side">
+        <dl class="facts">
+          <dt>Misure</dt><dd class="mono">180 × 210 × 170 mm</dd>
+          <dt>Caveau</dt><dd class="mono">≈ 150 × 135 × 95 mm</dd>
+          <dt>Apertura</dt><dd>Porta a battente, lo stepper ruota direttamente la cerniera</dd>
+          <dt>Parti</dt><dd><span class="sw n"></span>Nero 5 · <span class="sw b"></span>Bianco 2 · <span class="sw u"></span>Blu 1</dd>
+          <dt>Viti M3</dt><dd class="mono">≈ 10</dd>
+        </dl>
+        <div class="pc">
+          <div><span class="label">Pro</span><ul><li>Si riconosce subito come cassaforte</li><li>Il caveau più capiente delle quattro</li><li>Corpo in un pezzo su un piano da 220 mm</li></ul></div>
+          <div><span class="label">Contro</span><ul><li>Lo stepper (circa 0,03 N·m) gira la porta senza riduzione: se la porta pesa o la scatola non è in piano perde passi</li><li>La porta va alleggerita (guscio da 2 mm)</li><li>Quando si apre ingombra davanti</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===================== B ===================== -->
+  <article class="prop" id="scorrevole">
+    <div class="prop-head">
+      <span class="letter" aria-hidden="true">B</span>
+      <div class="t">
+        <h3>Scorrevole</h3>
+        <p>La porta blu scorre di lato dentro una colonna bianca, come una porta da fantascienza. Sulla porta le onde concentriche del brand in rilievo, nello stesso colore. La colonna è il pannello di controllo e il vano elettronica.</p>
+      </div>
+    </div>
+    <div class="figwrap">
+      <svg viewBox="-12 -18 530 186" role="img" aria-label="Proposta B, vista frontale e pianta in sezione">
+        <defs><clipPath id="clipB"><rect x="8" y="12" width="104" height="136" rx="8"/></clipPath></defs>
+        <text class="cap" x="0" y="-7">FRONTE · 232 × 160</text>
+        <text class="cap" x="272" y="-7">PIANTA IN SEZIONE · 232 × 150</text>
+        <!-- fronte -->
+        <path class="m-nero" d="M14 0H116V160H14Q0 160 0 146V14Q0 0 14 0Z"/>
+        <path class="m-bianco" d="M116 0H218Q232 0 232 14V146Q232 160 218 160H116Z"/>
+        <rect class="m-blu" x="8" y="12" width="104" height="136" rx="8"/>
+        <g clip-path="url(#clipB)">
+          <circle class="wave" cx="60" cy="148" r="26"/><circle class="wave" cx="60" cy="148" r="48"/><circle class="wave" cx="60" cy="148" r="70"/><circle class="wave" cx="60" cy="148" r="92"/><circle class="wave" cx="60" cy="148" r="114"/>
+        </g>
+        <rect class="hid" x="98" y="12" width="104" height="136" rx="8"/>
+        <rect class="hid" x="99" y="22" width="28" height="19"/>
+        <rect class="hid" x="1" y="56" width="7" height="24"/>
+        <rect class="hid" x="1" y="100" width="7" height="12"/>
+        <use href="#kh" x="167" y="12" width="14" height="18.1" class="c-blu"/>
+        <rect class="screen" x="157" y="42" width="34" height="22" rx="3"/>
+        <rect class="pix" x="161" y="46" width="16" height="2.4"/><rect class="pix" x="161" y="51" width="24" height="2.4"/><rect class="pix" x="161" y="56" width="10" height="2.4"/>
+        <circle class="diff" cx="162" cy="82" r="4.2"/><circle class="diff" cx="174" cy="82" r="4.2"/><circle class="diff" cx="186" cy="82" r="4.2"/>
+        <circle class="lr" cx="162" cy="82" r="2.6"/><circle class="ly" cx="174" cy="82" r="2.6"/><circle class="lb" cx="186" cy="82" r="2.6"/>
+        <path class="slot-l" d="M168.48 121.69 A7 7 0 0 1 179.52 121.69"/>
+        <path class="slot-l" d="M163.76 117.99 A13 13 0 0 1 184.24 117.99"/>
+        <circle class="hole-l" cx="174" cy="126" r="2.4"/>
+        <g class="mk" transform="translate(212 53)"><circle r="6"/><text>1</text></g>
+        <g class="mk" transform="translate(212 82)"><circle r="6"/><text>2</text></g>
+        <g class="mk" transform="translate(212 120)"><circle r="6"/><text>3</text></g>
+        <g class="mk" transform="translate(26 30)"><circle r="6"/><text>4</text></g>
+        <!-- pianta -->
+        <path class="sec" d="M286 0H388V150H286Q272 150 272 136V14Q272 0 286 0Z"/>
+        <path class="sec" d="M388 0H490Q504 0 504 14V136Q504 150 490 150H388Z"/>
+        <rect class="cav" x="282" y="10" width="82" height="118" rx="6"/>
+        <rect class="cav" x="278" y="132" width="222" height="12"/>
+        <rect class="cav" x="286" y="144" width="96" height="6"/>
+        <rect class="m-blu" x="280" y="134" width="104" height="8" rx="1"/>
+        <rect class="hid" x="370" y="134" width="104" height="8"/>
+        <path class="rack" d="M282 133.2 H382"/>
+        <circle class="comp" cx="377" cy="117" r="14"/>
+        <circle class="comp" cx="377" cy="127" r="6"/>
+        <rect class="bay" x="394" y="8" width="104" height="118" rx="4"/>
+        <rect class="comp" x="404" y="20" width="28" height="55" rx="2"/>
+        <rect class="comp" x="442" y="20" width="32" height="35" rx="2"/>
+        <rect class="hid" x="442" y="62" width="48" height="52" rx="2"/>
+        <rect class="m-bianco" x="398" y="0" width="96" height="5" rx="1"/>
+        <rect class="gap" x="470" y="0" width="9" height="5"/>
+        <rect class="comp" x="300" y="10" width="25" height="8" rx="1"/>
+        <rect class="comp" x="274" y="100" width="11" height="23" rx="1"/>
+        <rect class="comp" x="275" y="123" width="8" height="8" rx="1"/>
+        <g class="mk" transform="translate(352 112)"><circle r="6"/><text>5</text></g>
+        <g class="mk" transform="translate(295 106)"><circle r="6"/><text>6</text></g>
+        <g class="mk" transform="translate(295 123)"><circle r="6"/><text>7</text></g>
+        <g class="mk" transform="translate(334 14)"><circle r="6"/><text>8</text></g>
+        <g class="mk" transform="translate(418 96)"><circle r="6"/><text>9</text></g>
+      </svg>
+    </div>
+    <div class="cols">
+      <ol class="legend">
+        <li>Display OLED nella colonna fissa</li>
+        <li>3 LED in fila con diffusori e icona incisa sotto ciascuno</li>
+        <li>Griglia del buzzer ad archi; al centro, dove nel logo c'è la testa della serratura, il foro del sensore di luce</li>
+        <li>Porta blu con le onde concentriche in rilievo (stesso colore, solo profondità)</li>
+        <li>Stepper con pignone in un angolo chiuso del caveau; la cremagliera è stampata sul retro della porta</li>
+        <li>Servo con perno che entra nel bordo sinistro della porta</li>
+        <li>Sensore magnetico nel montante sinistro, magnete nel bordo della porta</li>
+        <li>Sensore umidità sulla parete di fondo</li>
+        <li>Vano elettronica dietro la tasca della porta, coperchio posteriore e foro USB</li>
+      </ol>
+      <div class="side">
+        <dl class="facts">
+          <dt>Misure</dt><dd class="mono">232 × 160 × 150 mm</dd>
+          <dt>Caveau</dt><dd class="mono">≈ 96 × 128 × 115 mm</dd>
+          <dt>Apertura</dt><dd>Porta scorrevole con cremagliera e pignone. Corsa 90 mm, libera circa 84 dei 96 mm del vano</dd>
+          <dt>Parti</dt><dd><span class="sw n"></span>Nero 4 · <span class="sw b"></span>Bianco 3 · <span class="sw u"></span>Blu 1</dd>
+          <dt>Viti M3</dt><dd class="mono">≈ 12 (4 uniscono i due moduli)</dd>
+        </dl>
+        <div class="pc">
+          <div><span class="label">Pro</span><ul><li>Con un pignone da 7 mm di raggio lo stepper spinge circa 4 N contro meno di 1 N di attrito: margine largo</li><li>Niente ingombro davanti, i cavi non si muovono mai</li><li>Due moduli larghi 116 mm: entrano in qualsiasi stampante</li></ul></div>
+          <div><span class="label">Contro</span><ul><li>Larga quasi il doppio del vano utile</li><li>La guida della porta va tarata (gioco ≈ 0,3 mm) con un provino</li><li>La porta non libera tutto il vano</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===================== C ===================== -->
+  <article class="prop" id="serratura">
+    <div class="prop-head">
+      <span class="letter" aria-hidden="true">C</span>
+      <div class="t">
+        <h3>Serratura</h3>
+        <p>Il corpo è il simbolo. La testa tonda è il caveau, con una porta circolare da banca; il trapezio sotto contiene pannello ed elettronica. Sopra, i due archi di segnale stampati a parte.</p>
+      </div>
+    </div>
+    <div class="figwrap">
+      <svg viewBox="-18 -16 380 300" role="img" aria-label="Proposta C, vista frontale e sezione laterale">
+        <text class="cap" x="-10" y="-5">FRONTE · 160 × 270 CON GLI ARCHI</text>
+        <text class="cap" x="200" y="-5">SEZIONE LATERALE · 150</text>
+        <g transform="translate(0 50)">
+          <path class="arc-edge" d="M12.23 17.02 A86 86 0 0 1 147.77 17.02"/>
+          <path class="arc-edge" d="M-5.10 3.47 A108 108 0 0 1 165.10 3.47"/>
+          <path class="arc-blu" d="M12.23 17.02 A86 86 0 0 1 147.77 17.02"/>
+          <path class="arc-blu" d="M-5.10 3.47 A108 108 0 0 1 165.10 3.47"/>
+          <path class="m-blu" d="M35.6 124.1A70 70 0 1 1 124.4 124.1L148 225L12 225Z"/>
+          <circle class="m-bianco" cx="80" cy="70" r="54"/>
+          <circle class="groove" cx="80" cy="70" r="45"/>
+          <rect class="m-bianco" x="22" y="44" width="8" height="14" rx="3"/>
+          <rect class="m-bianco" x="22" y="82" width="8" height="14" rx="3"/>
+          <rect class="m-nero" x="50" y="132" width="60" height="82" rx="8"/>
+          <rect class="screen" x="63" y="140" width="34" height="22" rx="3"/>
+          <rect class="pix" x="67" y="144" width="16" height="2.4"/><rect class="pix" x="67" y="149" width="24" height="2.4"/><rect class="pix" x="67" y="154" width="10" height="2.4"/>
+          <circle class="diff" cx="68" cy="176" r="4.2"/><circle class="diff" cx="80" cy="176" r="4.2"/><circle class="diff" cx="92" cy="176" r="4.2"/>
+          <circle class="lr" cx="68" cy="176" r="2.6"/><circle class="ly" cx="80" cy="176" r="2.6"/><circle class="lb" cx="92" cy="176" r="2.6"/>
+          <path class="slot-d" d="M76.06 200.92 A5 5 0 0 1 83.94 200.92"/>
+          <path class="slot-d" d="M72.51 198.15 A9.5 9.5 0 0 1 87.49 198.15"/>
+          <circle class="hole-d" cx="80" cy="204" r="1.8"/>
+          <rect class="hid" x="66" y="128" width="28" height="19"/>
+          <rect class="hid" x="134" y="58" width="12" height="23"/>
+          <rect class="hid" x="126" y="26" width="8" height="14"/>
+          <g class="mk" transform="translate(120 151)"><circle r="6"/><text>1</text></g>
+          <g class="mk" transform="translate(120 176)"><circle r="6"/><text>2</text></g>
+          <g class="mk" transform="translate(120 201)"><circle r="6"/><text>3</text></g>
+          <g class="mk" transform="translate(160 -24)"><circle r="6"/><text>4</text></g>
+          <g class="mk" transform="translate(160 70)"><circle r="6"/><text>6</text></g>
+          <g class="mk" transform="translate(152 40)"><circle r="6"/><text>7</text></g>
+        </g>
+        <g transform="translate(200 50)">
+          <rect class="m-blu" x="66" y="-43" width="14" height="62" rx="4"/>
+          <rect class="sec" x="0" y="0" width="150" height="225" rx="12"/>
+          <rect class="cav" x="12" y="14" width="126" height="110" rx="24"/>
+          <rect class="m-bianco" x="0" y="16" width="10" height="108" rx="2"/>
+          <rect class="comp" x="30" y="128" width="28" height="19" rx="2"/>
+          <path class="arm" d="M44 124 L14 112"/>
+          <rect class="m-nero" x="0" y="132" width="5" height="82" rx="1"/>
+          <rect class="comp" x="7" y="136" width="14" height="74" rx="2"/>
+          <rect class="bay" x="26" y="152" width="112" height="66" rx="4"/>
+          <rect class="comp" x="36" y="160" width="55" height="10" rx="1"/>
+          <rect class="comp" x="98" y="158" width="32" height="14" rx="1"/>
+          <rect class="hid" x="36" y="180" width="94" height="30" rx="2"/>
+          <rect class="m-blu" x="144" y="132" width="6" height="80" rx="1"/>
+          <rect class="gap" x="144" y="196" width="6" height="9"/>
+          <rect class="comp" x="130" y="52" width="8" height="25" rx="1"/>
+          <g class="mk" transform="translate(68 138)"><circle r="6"/><text>5</text></g>
+          <g class="mk" transform="translate(118 64)"><circle r="6"/><text>8</text></g>
+          <g class="mk" transform="translate(84 195)"><circle r="6"/><text>9</text></g>
+        </g>
+      </svg>
+    </div>
+    <div class="cols">
+      <ol class="legend">
+        <li>Display OLED sul pannello nero del collo</li>
+        <li>3 LED in fila</li>
+        <li>Griglia del buzzer ad archi e foro del sensore di luce</li>
+        <li>Archi di segnale blu, stampati a parte e uniti da una costola posteriore</li>
+        <li>Stepper nel collo con un braccio articolato che spinge la porta</li>
+        <li>Servo con chiavistello nel bordo destro della testa</li>
+        <li>Sensore magnetico in alto a destra, magnete nella porta</li>
+        <li>Sensore umidità sul fondo del caveau</li>
+        <li>Vano elettronica nel collo, coperchio posteriore e foro USB</li>
+      </ol>
+      <div class="side">
+        <dl class="facts">
+          <dt>Misure</dt><dd class="mono">160 × 270 × 150 mm (archi compresi)</dd>
+          <dt>Caveau</dt><dd class="mono">≈ Ø 110 × 125 mm, cilindrico</dd>
+          <dt>Apertura</dt><dd>Porta tonda a battente, aperta da un braccio articolato come gli automatismi dei cancelli</dd>
+          <dt>Parti</dt><dd><span class="sw u"></span>Blu 3 · <span class="sw b"></span>Bianco 2 · <span class="sw n"></span>Nero 3</dd>
+          <dt>Viti M3</dt><dd class="mono">≈ 12</dd>
+        </dl>
+        <div class="pc">
+          <div><span class="label">Pro</span><ul><li>La più riconoscibile: da lontano è il logo, e somiglia a Spy</li><li>La forma separa già da sola caveau ed elettronica</li><li>La porta tonda richiama il caveau di una banca</li></ul></div>
+          <div><span class="label">Contro</span><ul><li>Caveau piccolo e tondo</li><li>Il braccio articolato va progettato e tarato</li><li>Stampa più lunga, con superfici curve</li><li>BRAND.md vieta gli effetti 3D sul logo: qui il logo diventa un oggetto, va deciso insieme</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===================== D ===================== -->
+  <article class="prop" id="cassetto">
+    <div class="prop-head">
+      <span class="letter" aria-hidden="true">D</span>
+      <div class="t">
+        <h3>Cassetto</h3>
+        <p>Il caveau è un cassetto blu che esce da solo, come il carrello di un lettore CD. Sopra, un pannello nero inclinato si legge bene dall'alto. È l'alternativa se la "porta" può diventare un cassetto.</p>
+      </div>
+    </div>
+    <div class="figwrap">
+      <svg viewBox="-12 -18 396 232" role="img" aria-label="Proposta D, vista frontale e sezione laterale">
+        <text class="cap" x="0" y="-7">FRONTE · 150 × 200</text>
+        <text class="cap" x="190" y="-7">SEZIONE LATERALE · 180</text>
+        <!-- fronte -->
+        <rect class="m-bianco" x="0" y="0" width="150" height="200" rx="20"/>
+        <rect class="m-nero" x="10" y="10" width="130" height="54" rx="8"/>
+        <use href="#kh" x="18" y="19" width="14" height="18.1" class="c-bianco"/>
+        <rect class="screen" x="58" y="18" width="34" height="22" rx="3"/>
+        <rect class="pix" x="62" y="22" width="16" height="2.4"/><rect class="pix" x="62" y="27" width="24" height="2.4"/><rect class="pix" x="62" y="32" width="10" height="2.4"/>
+        <circle class="diff" cx="63" cy="52" r="4.2"/><circle class="diff" cx="75" cy="52" r="4.2"/><circle class="diff" cx="87" cy="52" r="4.2"/>
+        <circle class="lr" cx="63" cy="52" r="2.6"/><circle class="ly" cx="75" cy="52" r="2.6"/><circle class="lb" cx="87" cy="52" r="2.6"/>
+        <path class="slot-d" d="M117.27 36.30 A6 6 0 0 1 126.73 36.30"/>
+        <path class="slot-d" d="M113.33 33.22 A11 11 0 0 1 130.67 33.22"/>
+        <circle class="hole-d" cx="122" cy="40" r="1.8"/>
+        <rect class="m-blu" x="10" y="72" width="130" height="84" rx="8"/>
+        <use href="#kh" x="64" y="99.8" width="22" height="28.4" class="c-bianco"/>
+        <rect class="vent" x="29" y="176" width="8" height="3" rx="1.5"/><rect class="vent" x="41" y="176" width="8" height="3" rx="1.5"/><rect class="vent" x="53" y="176" width="8" height="3" rx="1.5"/><rect class="vent" x="65" y="176" width="8" height="3" rx="1.5"/><rect class="vent" x="77" y="176" width="8" height="3" rx="1.5"/><rect class="vent" x="89" y="176" width="8" height="3" rx="1.5"/><rect class="vent" x="101" y="176" width="8" height="3" rx="1.5"/><rect class="vent" x="113" y="176" width="8" height="3" rx="1.5"/>
+        <rect class="hid" x="18" y="164" width="19" height="28"/>
+        <rect class="hid" x="98" y="60" width="23" height="10"/>
+        <g class="mk" transform="translate(102 24)"><circle r="6"/><text>1</text></g>
+        <g class="mk" transform="translate(102 52)"><circle r="6"/><text>2</text></g>
+        <g class="mk" transform="translate(140 20)"><circle r="6"/><text>3</text></g>
+        <g class="mk" transform="translate(126 86)"><circle r="6"/><text>4</text></g>
+        <!-- sezione -->
+        <path class="sec" d="M190 200V66L224 10Q226 0 236 0H360Q370 0 370 10V190Q370 200 360 200Z"/>
+        <polygon class="m-nero" points="190,66 224,10 228.3,12.6 194.3,68.6"/>
+        <polygon class="comp" points="198,62 223,21 235,28 210,69"/>
+        <rect class="cav" x="197" y="76" width="142" height="78" rx="4"/>
+        <rect class="drawer" x="198" y="78" width="138" height="74" rx="3"/>
+        <rect class="m-blu" x="190" y="72" width="7" height="84" rx="1"/>
+        <path class="rack" d="M199 155.5 H333"/>
+        <circle class="comp" cx="222" cy="171" r="14"/>
+        <circle class="comp" cx="222" cy="162.5" r="6.5"/>
+        <rect class="bay" x="248" y="162" width="116" height="34" rx="4"/>
+        <rect class="comp" x="256" y="178" width="55" height="10" rx="1"/>
+        <rect class="comp" x="318" y="174" width="35" height="14" rx="1"/>
+        <rect class="comp" x="316" y="56" width="23" height="12" rx="1"/>
+        <path class="arm" d="M334 68 V80"/>
+        <rect class="comp" x="356" y="100" width="8" height="22" rx="1"/>
+        <rect class="comp" x="336" y="106" width="5" height="10" rx="1"/>
+        <rect class="comp" x="262" y="62" width="25" height="8" rx="1"/>
+        <path class="hid" d="M366 20 V160"/>
+        <rect class="gap" x="366" y="184" width="4" height="8"/>
+        <g class="mk" transform="translate(242 176)"><circle r="6"/><text>5</text></g>
+        <g class="mk" transform="translate(328 48)"><circle r="6"/><text>6</text></g>
+        <g class="mk" transform="translate(358 134)"><circle r="6"/><text>7</text></g>
+        <g class="mk" transform="translate(296 66)"><circle r="6"/><text>8</text></g>
+        <g class="mk" transform="translate(300 170)"><circle r="6"/><text>9</text></g>
+      </svg>
+    </div>
+    <div class="cols">
+      <ol class="legend">
+        <li>Display OLED sul pannello inclinato</li>
+        <li>3 LED in fila</li>
+        <li>Griglia del buzzer ad archi e foro del sensore di luce</li>
+        <li>Cassetto blu con simbolo bianco a incastro</li>
+        <li>Stepper e pignone nello zoccolo, cremagliera sotto il cassetto</li>
+        <li>Servo con perno che entra nel retro del cassetto</li>
+        <li>Sensore magnetico sulla parete di fondo, magnete sul retro del cassetto</li>
+        <li>Sensore umidità nel cielo del vano cassetto</li>
+        <li>Vano elettronica nello zoccolo, accesso dal retro e foro USB; i cavi del pannello scendono in un canale posteriore</li>
+      </ol>
+      <div class="side">
+        <dl class="facts">
+          <dt>Misure</dt><dd class="mono">150 × 200 × 180 mm</dd>
+          <dt>Caveau</dt><dd class="mono">cassetto ≈ 120 × 70 × 135 mm</dd>
+          <dt>Apertura</dt><dd>Cassetto motorizzato con cremagliera, esce di 100 mm</dd>
+          <dt>Parti</dt><dd><span class="sw b"></span>Bianco 4 · <span class="sw u"></span>Blu 1 · <span class="sw n"></span>Nero 3</dd>
+          <dt>Viti M3</dt><dd class="mono">≈ 10</dd>
+        </dl>
+        <div class="pc">
+          <div><span class="label">Pro</span><ul><li>Meccanica robusta come la B, in una torre compatta</li><li>Pannello inclinato, comodo da leggere su una scrivania</li><li>Il cassetto si sfila del tutto</li></ul></div>
+          <div><span class="label">Contro</span><ul><li>Non è più una porta: cambia il concept</li><li>Servono guide per il cassetto</li><li>Il cassetto esce per circa due terzi</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Confronto</span>
+    <h2>Le quattro a confronto</h2>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Criterio</th><th>A · Monolite</th><th>B · Scorrevole</th><th>C · Serratura</th><th>D · Cassetto</th></tr></thead>
+      <tbody>
+        <tr><td>Meccanica semplice e affidabile</td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td><td><span class="dots" aria-label="3 su 3">●●●</span></td><td><span class="dots" aria-label="1 su 3">●<i>●●</i></span></td><td><span class="dots" aria-label="3 su 3">●●●</span></td></tr>
+        <tr><td>Spazio utile nel caveau</td><td><span class="dots" aria-label="3 su 3">●●●</span></td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td><td><span class="dots" aria-label="1 su 3">●<i>●●</i></span></td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td></tr>
+        <tr><td>Riconoscibilità del brand</td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td><td><span class="dots" aria-label="3 su 3">●●●</span></td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td></tr>
+        <tr><td>Facilità di stampa</td><td><span class="dots" aria-label="3 su 3">●●●</span></td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td><td><span class="dots" aria-label="1 su 3">●<i>●●</i></span></td><td><span class="dots" aria-label="2 su 3">●●<i>●</i></span></td></tr>
+        <tr><td>Pezzo più grande</td><td class="mono">180 × 170 × 210</td><td class="mono">116 × 150 × 160</td><td class="mono">160 × 225 × 150</td><td class="mono">150 × 180 × 200</td></tr>
+        <tr><td>Viti M3</td><td class="mono">≈ 10</td><td class="mono">≈ 12</td><td class="mono">≈ 12</td><td class="mono">≈ 10</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pick">
+    <span class="label">Il mio consiglio</span>
+    <h3>Partire dalla B</h3>
+    <p>È l'unica in cui lo stepper del kit lavora con un margine largo, i cavi restano sempre fermi e ogni pezzo entra in qualsiasi stampante. Gli elementi si possono mescolare: per esempio il simbolo-maniglia della A sulla porta della B, o il pannello inclinato della D sopra la colonna.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Valide per tutte le proposte</span>
+    <h2>Regole comuni</h2>
+  </div>
+  <div class="grid2">
+    <div class="rule"><h3>Interfaccia sulla parte fissa</h3><p>Display, LED, buzzer e sensore di luce stanno sul corpo. Nessun cavo passa dalla porta: sulla porta c'è solo il magnete.</p></div>
+    <div class="rule"><h3>Pannello sostituibile</h3><p>La lista componenti non è chiusa. Se arriva un tastierino o una camera si ristampa il pannello (1–2 ore), non il corpo.</p></div>
+    <div class="rule"><h3>Un colore, un pezzo</h3><p>Niente multimateriale. Ogni colore è una parte a sé, unita con incastri: coda di rondine, clip a scatto, press-fit con 0,15 mm di interferenza.</p></div>
+    <div class="rule"><h3>Tre filamenti</h3><p>PLA nero (Inchiostro), bianco (Carta) e blu, il più vicino possibile a #1F4BFF. I diffusori dei LED sono in bianco da 0,8 mm, quindi niente filamento trasparente.</p></div>
+    <div class="rule"><h3>Forme del brand</h3><p>Volumi pieni e geometrici, superfici piatte, raggi di 8, 14, 20 e 28 mm come nei token. Nessuna texture: in rilievo solo i pattern ufficiali, nello stesso colore del pezzo.</p></div>
+    <div class="rule"><h3>Stati leggibili</h3><p>Blu = aperto, giallo = porta in movimento o attesa, rosso = allarme. Sotto ogni LED un'icona incisa, perché il brand chiede colore + icona. Il giallo non è in palette, ma è una luce di stato, non una superficie.</p></div>
+    <div class="rule"><h3>Sequenza di apertura e chiusura</h3><p>Apertura: il servo sblocca, lo stepper apre. Chiusura: lo stepper chiude, il sensore magnetico conferma, il servo blocca. Se il sensore non conferma: buzzer e LED rosso.</p></div>
+    <div class="rule"><h3>Vano elettronica</h3><p>Circa il 30% di spazio libero per i componenti che arriveranno, foro per il cavo USB e accesso dal retro senza smontare il caveau.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Viteria</span>
+    <h2>Un solo formato: M3</h2>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Elemento</th><th>Dove</th><th>Quantità</th></tr></thead>
+      <tbody>
+        <tr><td>Vite M3 × 10 a testa cilindrica (ISO 4762)</td><td>Coperchio del vano, stepper, giunzione dei moduli</td><td class="mono">8–14</td></tr>
+        <tr><td>Dado M3 in sede esagonale stampata</td><td>Sotto ogni vite. In alternativa l'inserto filettato a caldo M3: resta un solo tipo, regge meglio se smontate spesso</td><td class="mono">8–14</td></tr>
+        <tr><td>Nessuna vite</td><td>Pannello interfaccia e diffusori a scatto, simbolo e archi a coda di rondine, magnete a pressione, ESP32 e driver su pioli, cerniere con perno stampato. Le viti fornite con servo e display non servono</td><td class="mono">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Piano di lavoro</span>
+    <h2>Dal concept agli STL</h2>
+  </div>
+  <ol class="steps">
+    <li><div><b>Decisioni.</b> <span>Scegliamo insieme proposta, stampante e modelli esatti dei componenti (domande qui sotto).</span></div></li>
+    <li><div><b>Rilievo.</b> <span>Si misurano col calibro i componenti veri e le quote finiscono in un unico file di parametri.</span></div></li>
+    <li><div><b>Provini.</b> <span>Circa un'ora di stampa: giochi di incastro, sede del dado M3, clip, foro LED, finestra OLED e guida della porta. Le tolleranze si tarano sulla vostra stampante.</span></div></li>
+    <li><div><b>Meccanismo da solo.</b> <span>Serratura (servo + chiavistello) e apertura (stepper) su una piccola dima, provate con il codice del lab, prima di stampare il corpo.</span></div></li>
+    <li><div><b>Corpo e caveau.</b> <span>Modello parametrico in Blender con script Python, come la prima bozza: ogni quota è una variabile e cambia con un numero.</span></div></li>
+    <li><div><b>Pannello e sensori.</b> <span>OLED, LED, buzzer, luce, umidità, sensore magnetico e percorsi dei cavi.</span></div></li>
+    <li><div><b>Parti e stampa.</b> <span>Divisione per colore, orientamento senza supporti dove possibile, distinta delle viti.</span></div></li>
+    <li><div><b>Verifica.</b> <span>Render, export STL, controllo delle mesh, montaggio di prova e revisione.</span></div></li>
+  </ol>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Da chiudere insieme</span>
+    <h2>Domande aperte</h2>
+  </div>
+  <ol class="qs">
+    <li>Quale proposta sviluppiamo, o quale combinazione?</li>
+    <li>Che stampante usate e quanto è grande il piano? Decide se il corpo esce in un pezzo solo.</li>
+    <li>Il display è l'OLED 0,96" 128×64 del Mini project o uno più stretto (0,91" 128×32)?</li>
+    <li>Il sensore magnetico è un modulo reed o un contatto da porta a due blocchetti, tipo MC-38?</li>
+    <li>Il sensore di luce misura la luce ambiente (fuori) o capisce se il caveau è aperto o forzato (dentro)?</li>
+    <li>Cosa deve entrare nel caveau? Mi serve la misura minima interna.</li>
+    <li>Alimentazione: cavo USB sempre collegato o anche batteria?</li>
+  </ol>
+</section>
+
+</div>

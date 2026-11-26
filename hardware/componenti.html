@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Componenti InESPugnabile</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;800&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: catalogo a schede, raggruppato per ruolo nella cassaforte; foto in alto, scheda tecnica sotto */
+:root{
+  --bg:#F4F4F2; --surface:#FFFFFF; --fg:#111214; --fg-2:#55585C; --line:#D9DAD6;
+  --accent:#1F4BFF; --accent-soft:#E8EDFF; --photo:#E6E7E3;
+  --font-display:'Manrope','Arial Black',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111214; --surface:#1A1B1E; --fg:#FFFFFF; --fg-2:#A3A6AB; --line:#2A2B2E;
+  --accent:#6F8BFF; --accent-soft:#1D2547; --photo:#25262A; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#111214; --surface:#1A1B1E; --fg:#FFFFFF; --fg-2:#A3A6AB; --line:#2A2B2E;
+  --accent:#6F8BFF; --accent-soft:#1D2547; --photo:#25262A; color-scheme:dark }
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto;padding-block:40px 72px;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em;line-height:1.12;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5.2vw,56px)}
+h2{font-size:clamp(24px,3vw,32px)}
+h3{font-size:20px;letter-spacing:-.02em}
+p{margin:0}
+.label{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--fg-2)}
+.label.blue{color:var(--accent)}
+header{display:flex;flex-direction:column;gap:18px}
+.brandrow{display:flex;align-items:center;gap:10px}
+.brandrow svg{height:30px;width:auto;color:var(--accent)}
+.logotype{font-family:var(--font-display);font-weight:800;letter-spacing:-.045em;font-size:22px}
+.logotype b{color:var(--accent);font-weight:800}
+.lead{font-size:18px;color:var(--fg-2);max-width:64ch}
+nav{display:flex;flex-wrap:wrap;gap:8px}
+nav a{font-family:var(--font-mono);font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);text-decoration:none}
+nav a:hover{border-color:var(--accent);color:var(--accent)}
+section{display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px}
+.sec-head{display:flex;flex-direction:column;gap:6px}
+.sec-head p{color:var(--fg-2);max-width:68ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.card figure{margin:0;aspect-ratio:4/3;background:var(--photo);overflow:hidden}
+.card img{width:100%;height:100%;object-fit:cover;display:block;max-width:100%}
+.nophoto{width:100%;height:100%;display:grid;place-items:center;color:var(--fg-2);font-family:var(--font-mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase}
+.body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.title{display:flex;flex-direction:column;gap:4px}
+.model{font-family:var(--font-mono);font-size:13px;color:var(--fg-2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--font-mono);font-size:12px;padding:3px 10px;border-radius:14px;background:var(--accent-soft);color:var(--accent)}
+.chip.muted{background:transparent;border:1px solid var(--line);color:var(--fg-2)}
+dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;font-size:15px}
+dt{font-family:var(--font-mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--fg-2)}
+dd{margin:2px 0 0}
+.card.off{opacity:.72}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.note p{color:var(--fg-2);font-size:15px}
+footer{color:var(--fg-2);font-size:14px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* stampa / PDF: A4, tema chiaro, schede intere su ogni pagina */
+@page{size:A4;margin:12mm}
+@media print{
+  :root{--bg:#FFFFFF;--surface:#FFFFFF;--fg:#111214;--fg-2:#55585C;--line:#D9DAD6;--accent:#1F4BFF;--accent-soft:#E8EDFF;--photo:#E6E7E3;color-scheme:light}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html{padding:0}
+  body{padding:0;font-size:11pt}
+  .wrap{max-width:none;padding:0;gap:22px}
+  nav{display:none}
+  h1{font-size:30pt} h2{font-size:18pt} h3{font-size:12.5pt}
+  .lead{font-size:11.5pt}
+  .wrap,section{display:block}
+  .wrap>*+*{margin-top:20px}
+  .sec-head{margin-bottom:10px;break-inside:avoid;page-break-after:avoid}
+  .sec-head h2{break-after:avoid;page-break-after:avoid}
+  .grid,.notes{break-before:avoid;page-break-before:avoid}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .card{break-inside:avoid;border-radius:12px}
+  .card figure{aspect-ratio:4/3}
+  .body{padding:10px 12px 12px;gap:7px}
+  dl{font-size:9pt;gap:6px} dt{font-size:7pt}
+  .model{font-size:8.5pt} .chip{font-size:7.5pt;padding:2px 7px}
+  .sec-head{break-after:avoid}
+  .notes{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .note{break-inside:avoid;padding:12px} .note p{font-size:9pt}
+  .card.off{opacity:1}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="kh" viewBox="14 6 72 93">
+    <path d="M20.06 26.60 A38 38 0 0 1 79.94 26.60" fill="none" stroke="currentColor" stroke-width="6.6" stroke-linecap="round"/>
+    <path d="M31.09 35.22 A24 24 0 0 1 68.91 35.22" fill="none" stroke="currentColor" stroke-width="6.6" stroke-linecap="round"/>
+    <circle cx="50" cy="50" r="13.7" fill="currentColor"/>
+    <path d="M42.4 56 L57.6 56 L63.3 96 L36.7 96 Z" fill="currentColor"/>
+  </symbol>
+</svg>
+<div class="wrap">
+
+<header>
+  <div class="brandrow">
+    <svg viewBox="14 6 72 93" aria-hidden="true"><use href="#kh"/></svg>
+    <span class="logotype">In<b>ESP</b>ugnabile</span>
+  </div>
+  <span class="label blue">Hardware · Elenco componenti</span>
+  <h1>Cosa c'è dentro il caveau</h1>
+  <p class="lead">I 18 componenti del progetto, con la loro funzione nella cassaforte e il punto in cui stanno nel modello 3D Monolite. Due voci non hanno foto: il sensore a ultrasuoni, che non usiamo, e il pulsante di reset.</p>
+  <nav aria-label="Sezioni">
+    <a href="#cervello">Cervello</a>
+    <a href="#interfaccia">Interfaccia</a>
+    <a href="#sensori">Sensori</a>
+    <a href="#attuatori">Motori</a>
+    <a href="#alimentazione">Alimentazione</a>
+    <a href="#note">Note</a>
+  </nav>
+</header>
+
+<section id="cervello">
+  <div class="sec-head"><span class="label">1 componente</span><h2>Cervello</h2></div>
+  <div class="grid">
+    <article class="card">
+      <figure><img src="foto/eva-zm1.jpg" alt="Scheda Zerynth EVA-ZM1 nella sua confezione trasparente" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Zerynth EVA-ZM1</h3><span class="model">modulo ZM1 · ESP32-WROOM-32SE</span></div>
+        <div class="chips"><span class="chip">Wi-Fi</span><span class="chip">USB micro</span><span class="chip muted">logica 3,3 V</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Legge tutti i sensori, muove servo e stepper, gestisce PIN e allarmi, serve l'interfaccia web e manda i dati in rete.</dd></div>
+          <div><dt>Nel modello</dt><dd>Vano elettronica, sulla breadboard fissata alla paratia. La porta USB serve per programmarla.</dd></div>
+        </dl>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="interfaccia">
+  <div class="sec-head"><span class="label">4 componenti</span><h2>Interfaccia sul fronte</h2><p>Stanno tutti sul pannello della fascia comandi, che si toglie a scatto.</p></div>
+  <div class="grid">
+    <article class="card">
+      <figure><img src="foto/tastierino-4x4.jpg" alt="Tastierino a membrana 4 per 4 con tasti blu e rossi e cavo piatto" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Tastierino a membrana 4×4</h3><span class="model">16 tasti · 69 × 77 mm</span></div>
+        <div class="chips"><span class="chip">8 pin digitali</span><span class="chip muted">adesivo</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Inserire il PIN. Le lettere A–D restano per le funzioni, * cancella, # conferma.</dd></div>
+          <div><dt>Nel modello</dt><dd>Metà destra del pannello; il cavo piatto entra nella fascia da un'asola nascosta sotto il bordo basso.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/oled-ssd1306.jpg" alt="Display OLED blu da 0,96 pollici con quattro pin" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Display OLED 0,96"</h3><span class="model">SSD1306 · 128 × 64</span></div>
+        <div class="chips"><span class="chip">I²C · 0x3C</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Mostra PIN, stato e messaggi: "Caveau chiuso", tentativi rimasti, umidità.</dd></div>
+          <div><dt>Nel modello</dt><dd>Pannello, colonna sinistra, accanto alla griglia del buzzer. La scheda sta su 4 pioli.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/semaforo-led.jpg" alt="Modulo semaforo con LED rosso, giallo e verde" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Modulo semaforo LED</h3><span class="model">rosso · giallo · verde</span></div>
+        <div class="chips"><span class="chip">3 pin digitali</span><span class="chip muted">+ GND</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Lo stato a colpo d'occhio: verde aperta, giallo in apertura o problema meccanico, rosso chiusa.</dd></div>
+          <div><dt>Nel modello</dt><dd>Pannello in alto a sinistra, ruotato per leggere verde, giallo, rosso da sinistra. Sopra ogni LED c'è un'icona incisa.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/buzzer.jpg" alt="Buzzer piezo nero da 12 millimetri tenuto tra le dita" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Buzzer piezo</h3><span class="model">Ø12 mm</span></div>
+        <div class="chips"><span class="chip">PWM</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Suoni di conferma, PIN errato e allarme.</dd></div>
+          <div><dt>Nel modello</dt><dd>Pannello, dietro la griglia a forma di archi di segnale.</dd></div>
+        </dl>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="sensori">
+  <div class="sec-head"><span class="label">8 componenti · 1 non usato</span><h2>Sensori</h2><p>Quelli che misurano il caveau guardano dentro dalla paratia; i loro piedini sono già nel vano elettronica, così nessun cavo passa dalla porta.</p></div>
+  <div class="grid">
+    <article class="card">
+      <figure><img src="foto/hall-hw484.jpg" alt="Modulo rosso HW-484 con sensore Hall nero su tre piedini e trimmer blu" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Sensore Hall HW-484</h3><span class="model">KY-024 · sensore lineare 49E</span></div>
+        <div class="chips"><span class="chip">analogico AO</span><span class="chip">digitale DO</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Sente il magnete nella porta: conferma che la porta è davvero chiusa prima di bloccare il chiavistello.</dd></div>
+          <div><dt>Nel modello</dt><dd>Culla nella fascia, sopra l'angolo in alto a destra della porta. Il magnete (circa Ø18 × 4 mm) è nella porta.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/ir-hw201.jpg" alt="Modulo IR blu HW-201 con LED trasparente e ricevitore nero" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Sensore IR di ostacoli ×2</h3><span class="model">HW-201 · tipo FC-51</span></div>
+        <div class="chips"><span class="chip">digitale</span><span class="chip muted">portata col trimmer</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Il primo segnala la porta aperta a 90°: è il riferimento dello stepper, che da solo non sa dove si trova. Il secondo rileva se c'è un oggetto nel caveau.</dd></div>
+          <div><dt>Nel modello</dt><dd>Il primo nella cornice sinistra del fronte, inclinato verso la porta. Il secondo in basso sulla paratia, rivolto alla porta, con portata sotto i 7 cm.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/pir-hc-sr501.jpg" alt="Sensore di movimento PIR con cupola bianca sfaccettata" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Sensore di movimento PIR</h3><span class="model">HC-SR501</span></div>
+        <div class="chips"><span class="chip">digitale</span><span class="chip muted">5 V</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Si accorge di chi si avvicina: accende display e semaforo e sveglia il sistema.</dd></div>
+          <div><dt>Nel modello</dt><dd>Pannello, in basso a sinistra: la cupola esce da un foro Ø23,5. I trimmer restano raggiungibili da dentro.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/dht22.jpg" alt="Sensore DHT22 bianco con griglia e quattro piedini" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Temperatura e umidità</h3><span class="model">DHT22 · AM2302</span></div>
+        <div class="chips"><span class="chip">digitale 1 filo</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Misura temperatura e umidità dentro il caveau, per proteggere quello che c'è dentro.</dd></div>
+          <div><dt>Nel modello</dt><dd>Sulla paratia, dietro una griglia rivolta al caveau.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/tsl2561-gy2561.jpg" alt="Schedina blu GY-2561 nella busta antistatica" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Sensore di luminosità</h3><span class="model">GY-2561 · TSL2561</span></div>
+        <div class="chips"><span class="chip">I²C · 0x39</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Misura la luce dentro il caveau in lux: se entra luce, la porta è aperta o forzata.</dd></div>
+          <div><dt>Nel modello</dt><dd>Sulla paratia, lato vano, e guarda il caveau da una finestra.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/mpu6050-gy521.jpg" alt="Schedina blu MPU-6050 con otto pin" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Accelerometro e giroscopio</h3><span class="model">GY-521 · MPU-6050</span></div>
+        <div class="chips"><span class="chip">I²C · 0x68</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Si accorge se la cassaforte viene sollevata, inclinata o scossa, e fa partire l'allarme.</dd></div>
+          <div><dt>Nel modello</dt><dd>Sulla paratia, lato vano, fissato rigido su due pioli.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><div class="nophoto">Foto mancante</div></figure>
+      <div class="body">
+        <div class="title"><h3>Pulsante di reset</h3><span class="model">micro pulsante</span></div>
+        <div class="chips"><span class="chip">pin EN</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Riavvia la scheda senza staccare la batteria.</dd></div>
+          <div><dt>Nel modello</dt><dd>Foro incassato nel coperchio posteriore, così non si preme per sbaglio.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card off">
+      <figure><div class="nophoto">Non usato</div></figure>
+      <div class="body">
+        <div class="title"><h3>Sensore a ultrasuoni</h3><span class="model">probabilmente HC-SR04</span></div>
+        <div class="chips"><span class="chip muted">non montato</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Non lo usiamo: sul fronte non c'è spazio e PIR e IR coprono già presenza e oggetti.</dd></div>
+        </dl>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="attuatori">
+  <div class="sec-head"><span class="label">3 componenti</span><h2>Motori</h2></div>
+  <div class="grid">
+    <article class="card">
+      <figure><img src="foto/servo-sg90.jpg" alt="Micro servo Tower Pro SG90 blu con cavo e squadrette" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Micro servo</h3><span class="model">Tower Pro SG90</span></div>
+        <div class="chips"><span class="chip">PWM</span><span class="chip muted">5 V</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>La serratura: ruota il chiavistello dentro il riscontro sul retro della porta.</dd></div>
+          <div><dt>Nel modello</dt><dd>Colonna nel montante destro del caveau, in una slitta a T senza viti.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/stepper-28byj48.jpg" alt="Motore passo-passo 28BYJ-48 argento con cavi colorati" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Motore passo-passo</h3><span class="model">28BYJ-48 · 5 V</span></div>
+        <div class="chips"><span class="chip">tramite ULN2003</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Apre e chiude la porta: il suo albero è l'asse della cerniera.</dd></div>
+          <div><dt>Nel modello</dt><dd>Fascia comandi, in alto a sinistra, tenuto da una staffa con 2 viti M3.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/driver-uln2003.jpg" alt="Scheda verde ULN2003 con chip, connettore bianco e quattro LED" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Driver dello stepper</h3><span class="model">ULN2003</span></div>
+        <div class="chips"><span class="chip">4 pin digitali</span><span class="chip muted">IN1–IN4</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Amplifica i segnali dell'ESP32 per alimentare le bobine dello stepper.</dd></div>
+          <div><dt>Nel modello</dt><dd>Paratia, lato vano, su 4 pioli stampati.</dd></div>
+        </dl>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="alimentazione">
+  <div class="sec-head"><span class="label">2 componenti</span><h2>Alimentazione</h2><p>La cassaforte va solo a batteria.</p></div>
+  <div class="grid">
+    <article class="card">
+      <figure><img src="foto/hw131-batteria-9v.jpg" alt="Alimentatore da breadboard HW-131 accanto alla batteria 9V con cavo jack" loading="lazy"></figure>
+      <div class="body">
+        <div class="title"><h3>Alimentatore da breadboard</h3><span class="model">HW-131 · tipo MB102</span></div>
+        <div class="chips"><span class="chip">5 V e 3,3 V</span><span class="chip muted">ingresso jack DC</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Porta la 9V a 5 V e 3,3 V sulle linee della breadboard. Ha l'interruttore di accensione.</dd></div>
+          <div><dt>Nel modello</dt><dd>Sulla breadboard nel vano; un foro nel coperchio posteriore lascia premere l'interruttore da fuori.</dd></div>
+        </dl>
+      </div>
+    </article>
+    <article class="card">
+      <figure><img src="foto/hw131-batteria-9v.jpg" alt="Batteria 9V alcalina con clip e cavo jack DC" loading="lazy" style="object-position:top"></figure>
+      <div class="body">
+        <div class="title"><h3>Batteria 9V</h3><span class="model">alcalina · cavo con jack DC</span></div>
+        <div class="chips"><span class="chip">9 V</span></div>
+        <dl>
+          <div><dt>Funzione</dt><dd>Alimenta tutto senza cavi.</dd></div>
+          <div><dt>Nel modello</dt><dd>Vano sul fondo del vano elettronica, con sportellino a scatto nel coperchio: si cambia senza viti.</dd></div>
+        </dl>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="note">
+  <div class="sec-head"><span class="label">Da sapere</span><h2>Note</h2></div>
+  <div class="notes">
+    <div class="note"><h3>Durata della batteria</h3><p>Una 9V alcalina tiene circa 500 mAh. Con ESP32 in Wi-Fi, stepper e servo dura poche ore. Nel firmware conviene spegnere le bobine dello stepper quando è fermo. Con lo stesso vano si può usare una 9V ricaricabile al litio.</p></div>
+    <div class="note"><h3>Pin dell'ESP32</h3><p>Servono circa 24 pin: tastierino 8, I²C 2 (condivisi da OLED, TSL2561 e MPU-6050), DHT22 1, Hall 1, IR 2, PIR 1, buzzer 1, semaforo 3, servo 1, stepper 4. Il reset usa EN. PIR, IR e Hall vanno sui pin di solo ingresso 34, 35, 36 e 39.</p></div>
+    <div class="note"><h3>Misure da prendere</h3><p>Nel modello 3D le schedine nuove hanno misure tipiche. Vanno controllate col calibro: semaforo, PIR, GY-2561, HW-484, HW-201, MPU-6050, magnete, pulsante di reset e breadboard.</p></div>
+  </div>
+</section>
+
+<footer>InESPugnabile · Progetto IoT · gruppo G25</footer>
+</div>
+</body>
+</html>

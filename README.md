@@ -7,7 +7,7 @@
 
 | Cartella | Contenuto |
 |---|---|
-| `stampa/` | Modello CAD, render e STL della cassaforte (in rifacimento da zero) |
+| `stampa/` | Modello parametrico "Monolite" (Blender + Python), render e STL: vedi `stampa/README.md` |
 | `brand/` | Identità del brand: regole (`BRAND.md`), loghi, pattern, mascotte e design token |
 | `software/` | Codice del progetto (firmware, backend, dashboard…) |
 

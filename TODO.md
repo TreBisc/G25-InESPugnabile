@@ -29,6 +29,6 @@ Progetto d'esame del corso **Internet of Things**: cassaforte IoT stampabile in 
 
 - Repository: [TreBisc/G25-InESPugnabile](https://github.com/TreBisc/G25-InESPugnabile) (privata)
 - Teoria, slide e laboratori del corso: cartella superiore `Internet Of Things/`, fuori dal repository
-- Modello 3D: `stampa/`, da rifare da zero (la prima bozza è nella cronologia git, commit `702a7d1`)
+- Modello 3D: `stampa/`, versione Monolite v1 (`stampa/README.md`); la prima bozza è nella cronologia git, commit `702a7d1`
 - Identità del brand: `brand/` (leggere prima `brand/BRAND.md`)
 - Codice: `software/`
